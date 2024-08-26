@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO List</title>
+    <style>
+        body {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            color: white;
+            background-color: #282c34;
+        }       
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            margin-top: 50px;
+            background-color: blue;
+            padding: 5%;
+            width: 50%;
+        }
+        .container h1 {
+            text-align: center;
+            margin-top: auto;
+            color: white;
+            font-size: xx-large;
+            font-weight: bold;
+        }
+        .container input {
+            width: 400px;
+            border: white 1px solid;
+            height: 50px;
+            border-radius: 100px;
+            text-align: justify;
+            margin-top: 10px;
+        }
+        .container button {
+            background-color: #ff00ea;
+            padding: 10px 25px;
+            border: white 1px solid;
+            border-radius: 100px;
+            color: white;
+            font-weight: bold;
+            font-size: medium;
+            text-align: center;
+            margin: 5px;
+            cursor: pointer;
+        }
+        #taskD {
+            margin-top: 20px;
+        }
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #444;
+            padding: 10px;
+            margin: 5px;
+            list-style: none;
+            border-radius: 8px;
+            width: 90%;
+        }
+        .edit-btn, .delete-btn {
+            margin-left: 10px;
+            background-color: yellow;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: black;
+            cursor: pointer;
+        }
+        .delete-btn {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ToDo List</h1>
+        <input id="addTask" placeholder="Input your task here">
+        <div>
+            <button onclick="addition()">Addition</button>
+        </div>
+        <ul id="taskD"></ul>
+    </div>
+    <script>
+        let todoList = [];
+
+        window.onload = function() {
+            const savedData = localStorage.getItem('todoList');
+            if (savedData) {
+                todoList = JSON.parse(savedData);
+                displayTask();
+            }
+        }
+
+        function addition() {
+            const addTask = document.getElementById('addTask').value;
+            if (addTask === '') {
+                alert('Field cannot be empty!!!');
+                return;
+            }
+            todoList.push(addTask);
+            displayTask();
+            document.getElementById('addTask').value = '';
+            updateLocalStorage();
+        }
+
+        function displayTask() {
+            const taskD = document.getElementById('taskD');
+            taskD.innerHTML = ''; 
+            todoList.forEach((task, index) => {
+                const item = document.createElement('li');
+                
+                const taskText = document.createElement('span');
+                taskText.textContent = task;
+                taskText.id = `task-${index}`;
+                
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Edit';
+                editBtn.classList.add('edit-btn');
+                editBtn.onclick = () => editTask(index);
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.onclick = () => deleteTask(index);
+
+                item.appendChild(taskText);
+                item.appendChild(editBtn);
+                item.appendChild(deleteBtn);
+                taskD.appendChild(item);
+            });
+        }
+
+        function editTask(index) {
+            const taskText = document.getElementById(`task-${index}`);
+            const originalTask = todoList[index];
+            const inputField = document.createElement('input');
+            inputField.value = originalTask;
+            inputField.id = `edit-task-${index}`;
+            
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = 'Save';
+            saveBtn.classList.add('edit-btn');
+            saveBtn.onclick = () => saveTask(index);
+
+            taskText.replaceWith(inputField);
+            const editBtn = inputField.nextElementSibling;
+            editBtn.replaceWith(saveBtn);
+        }
+
+        function saveTask(index) {
+            const updatedTask = document.getElementById(`edit-task-${index}`).value;
+            if (updatedTask === '') {
+                alert('Field cannot be empty!!!');
+                return;
+            }
+            todoList[index] = updatedTask;
+            updateLocalStorage();
+            displayTask();
+        }
+
+        function deleteTask(index) {
+            todoList.splice(index, 1);
+            updateLocalStorage();
+            displayTask();
+        }
+
+        function updateLocalStorage() {
+            localStorage.setItem('todoList', JSON.stringify(todoList));
+        }
+    </script>
+</body>
+</html>
